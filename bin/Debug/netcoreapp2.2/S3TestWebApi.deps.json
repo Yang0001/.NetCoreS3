@@ -28,7 +28,8 @@
           "AWSSDK.S3": "3.3.31.19",
           "Microsoft.AspNetCore.App": "2.2.0",
           "Microsoft.AspNetCore.Razor.Design": "2.2.0",
-          "Microsoft.NETCore.App": "2.2.0"
+          "Microsoft.NETCore.App": "2.2.0",
+          "System.IO.FileSystem": "4.3.0"
         },
         "runtime": {
           "S3TestWebApi.dll": {}

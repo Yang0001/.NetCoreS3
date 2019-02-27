@@ -25,10 +25,25 @@ namespace S3TestWebApi.Controllers
         public async Task<IActionResult> CreateBucket([FromRoute] string bucketName)
         {
             var response = await _service.CreateBucketAsync(bucketName);
-
             return Ok(response);
         }
 
+        [HttpPost]        
+        [Route("AddFile/{bucketName}")]
+        public async Task<IActionResult> AddFile([FromRoute] string bucketName)
+        {
+            await _service.UploadFIleAsync(bucketName);
+            return Ok();
+        }
+   
+        [HttpGet]
+        [Route("GetFile/{bucketName}")]
+        public async Task<IActionResult> DownloadObjectFromS3Async ([FromRoute] string bucketName)
+        {
+            await _service.DownloadObjectFromS3Async(bucketName);
+            return Ok();
+        }
+       
        
     
 
