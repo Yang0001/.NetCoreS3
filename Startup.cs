@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Amazon.S3;
 using S3TestWebApi.Controllers;
 using S3TestWebApi.Services;
+using System.Diagnostics;
 
 //dotnet add package AWSSDK.Extensions.NETCore.Setup
 
@@ -21,13 +22,15 @@ namespace S3TestWebApi
 {
     public class Startup
     {
+        
+
         public Startup(IConfiguration configuration)
         {
             // Configuration = new ConfigurationBuilder()
             //     .SetBasePath(Directory.GetCurrentDirectory())
             //     .AddJsonFile("appsettings.Development.json")
             //     .Build();
-            Configuration = configuration;
+            Configuration = configuration;          
             
         }        
 
@@ -42,12 +45,9 @@ namespace S3TestWebApi
             services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
 
             // This will find "AWS" section in your app settings
-            services.AddAWSService<IAmazonS3>();
- 
+            services.AddAWSService<IAmazonS3>(); 
 
             services.AddSingleton<IS3Service, S3Service>();
-            
-            
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -55,9 +55,6 @@ namespace S3TestWebApi
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

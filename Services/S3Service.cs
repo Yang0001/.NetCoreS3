@@ -20,13 +20,12 @@ namespace S3TestWebApi.Services
     {
 
         private readonly IAmazonS3 _client;
-        IAmazonS3 client { get; set; }
+        // IAmazonS3 client { get; set; }
         public S3Service(IAmazonS3 client)
         {
             _client = client;
         }
-
-
+        // S3 Cofiguration can also be store in here
         // public S3Service()
         // {
         //      var config = new AmazonS3Config
@@ -86,7 +85,6 @@ namespace S3TestWebApi.Services
             {
                 Status = HttpStatusCode.InternalServerError,
                 Message = "Something went wrong"
-
             };
         }
 
@@ -99,8 +97,7 @@ namespace S3TestWebApi.Services
         {
             try
             {
-                var fileTransferUtility = new TransferUtility(_client);
-                
+                var fileTransferUtility = new TransferUtility(_client);                
 
                 //Option1
                 await fileTransferUtility.UploadAsync(FilePath, bucketName);
@@ -187,6 +184,164 @@ namespace S3TestWebApi.Services
                 Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
             }
 
+        }
+
+
+        public async Task MoveObjects(string sourceBucket, string destinationBucket)
+        {
+            try
+            {    
+                ListObjectsV2Request request = new ListObjectsV2Request
+                {
+                    BucketName = sourceBucket,
+                    MaxKeys = 10
+                };
+                ListObjectsV2Response response;
+                do
+                {
+                    response = await _client.ListObjectsV2Async(request);
+                    
+                    // Process the response.
+                    foreach (S3Object entry in response.S3Objects)
+                    {                           
+                        Console.WriteLine("key = {0} size = {1}",
+                        entry.Key, entry.Size);   
+
+                        GetObjectTaggingRequest getTagsRequest = new GetObjectTaggingRequest                        
+                        {
+                            BucketName = sourceBucket,
+                            Key = entry.Key
+                        };
+                        
+                        GetObjectTaggingResponse objectTags = await _client.GetObjectTaggingAsync(getTagsRequest);
+                        
+                        if (objectTags.Tagging.Any(x => x.Key == "av-status")){
+
+                            if (objectTags.Tagging[1].Value == "CLEAN")                         
+                            {
+                                Console.WriteLine("objectTags.Tagging[1].Key----" + objectTags.Tagging[1].Key);
+                                Console.WriteLine("objectTags.Tagging[1].Value----" + objectTags.Tagging[1].Value);
+                                await CopyObject(sourceBucket, entry.Key, destinationBucket, entry.Key);
+                                await DeleteObject(sourceBucket, entry.Key);
+
+                                Console.WriteLine("Object move complete");
+                            }
+                        }
+
+                    }
+                    Console.WriteLine("Next Continuation Token: {0}",response.NextContinuationToken);
+                    request.ContinuationToken = response.NextContinuationToken;
+                } while (response.IsTruncated);
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                Console.WriteLine("S3 error occurred. Exception: " + amazonS3Exception.ToString());
+                Console.ReadKey();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.ToString());
+                Console.ReadKey();
+            }
+        }
+
+        // public async Task ListingObjectsAsync(string bucketName)
+        // {
+        //     try
+        //     {    
+        //         ListObjectsV2Request request = new ListObjectsV2Request
+        //         {
+        //             BucketName = bucketName,
+        //             MaxKeys = 10
+        //         };
+        //         ListObjectsV2Response response;
+        //         do
+        //         {
+        //             response = await _client.ListObjectsV2Async(request);
+                    
+        //             // Process the response.
+        //             foreach (S3Object entry in response.S3Objects)
+        //             {
+        //                 Console.WriteLine("key = {0} size = {1}",
+        //                     entry.Key, entry.Size);
+        //             }
+        //             Console.WriteLine("Next Continuation Token: {0}", response.NextContinuationToken);
+        //             request.ContinuationToken = response.NextContinuationToken;
+        //         } while (response.IsTruncated);
+        //     }
+        //     catch (AmazonS3Exception amazonS3Exception)
+        //     {
+        //         Console.WriteLine("S3 error occurred. Exception: " + amazonS3Exception.ToString());
+        //         Console.ReadKey();
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Console.WriteLine("Exception: " + e.ToString());
+        //         Console.ReadKey();
+        //     }
+        // }
+
+        public async Task CopyObject(string sourceBucket,string objectKey, string destinationBucket, string destObjectKey)
+        {
+            try
+            {
+                CopyObjectRequest request = new CopyObjectRequest
+                {
+                    
+                    SourceBucket = sourceBucket,
+                    SourceKey = objectKey,
+                    DestinationBucket = destinationBucket,
+                    DestinationKey = destObjectKey
+                };
+                CopyObjectResponse response = await _client.CopyObjectAsync(request);
+            }
+            catch (AmazonS3Exception e)
+            {
+                Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+        }
+
+
+        public async Task DeleteObject(string bucketName, string keyName)
+        {
+            try
+            {
+                var deleteObjectRequest = new DeleteObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = keyName
+                };
+
+                Console.WriteLine("Deleting an object");
+                await _client.DeleteObjectAsync(deleteObjectRequest);
+            }
+            catch (AmazonS3Exception e)
+            {
+                Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+        public Task ListingObjectsAsync(string bucketName)
+        {
+            throw new NotImplementedException();
         }
     }
 

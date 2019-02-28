@@ -43,7 +43,26 @@ namespace S3TestWebApi.Controllers
             await _service.DownloadObjectFromS3Async(bucketName);
             return Ok();
         }
+
+        [HttpGet]
+        [Route("GetFileList/{bucketName}")]
+        public async Task<IActionResult> ListingObjectsAsync ([FromRoute] string bucketName)
+        {
+            await _service.ListingObjectsAsync(bucketName);
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("Move")]
+        public async Task<IActionResult> MoveObjects()
+        {
+            string Source = "upload-yyyppp";
+            string Des = "db-yyyppp";
+            await _service.MoveObjects(Source,Des);
+            return Ok();
+        }
        
+
        
     
 
