@@ -34,8 +34,8 @@ namespace S3TestWebApi.Services
         //         // ServiceURL = "http://localhost:9000", // replace http://localhost:9000 with URL of your minio server
         //         ForcePathStyle = true // MUST be true to work correctly with Minio server
         //     };
-        //     var accessKey = "AKIAJHXSSXJP5B4AK3UQ";
-        //     var secretKey = "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";
+        //     var accessKey = "";
+        //     var secretKey = "";
         //     _client = new AmazonS3Client(accessKey, secretKey, config);            
         // }
 
