@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using S3TestWebApi.Models;
 using S3TestWebApi.Services;
 
-// 
+// changed type to json
 
 namespace S3TestWebApi.Controllers
 {
