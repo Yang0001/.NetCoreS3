@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using S3TestWebApi.Models;
 using S3TestWebApi.Services;
-//dotnet add package AWSSDK.Extensions.NETCore.Setup
+
 
 namespace S3TestWebApi.Controllers
 {
