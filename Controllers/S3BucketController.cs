@@ -56,8 +56,8 @@ namespace S3TestWebApi.Controllers
         [Route("Move")]
         public async Task<IActionResult> MoveObjects()
         {
-            string Source = "upload-yyyppp";
-            string Des = "db-yyyppp";
+            string Source = "upload-yang";
+            string Des = "des-yang";
             await _service.MoveObjects(Source,Des);
             return Ok();
         }
